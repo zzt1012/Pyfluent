@@ -38,7 +38,7 @@ PyFluent的主要模块`ansys-fluent-core`提供以下功能：
 
 
 
-(Pic/微信图片_20240126100456.png)
+![Alt Text](Pic/微信图片_20240126100456.png)
 
 # 二、代码展示及结果
 
@@ -144,6 +144,7 @@ solver.exit()
 
 ## 2、结果展示
 
-![image-20240126095802355](C:\Users\zt\AppData\Roaming\Typora\typora-user-images\image-20240126095802355.png)
+![Alt Text](Pic/微信图片_20240126100456.png)
+![Alt Text](Pic/微信图片_20240126100456.png)
 
 ![Pic/微信图片_20240126100410.png)
