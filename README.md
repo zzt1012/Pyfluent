@@ -23,7 +23,7 @@ PyFluent的主要模块`ansys-fluent-core`提供以下功能：
 - 能够使用MonitorsManager模块检索求解器监视器，例如残差
 
 安装条件：
-Python版本3.7~3.10；Fluent版本2022R2以上
+Python版本 3.7~3.10；Fluent版本 2022R2以上
 
 
 
