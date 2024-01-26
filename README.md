@@ -22,6 +22,9 @@ PyFluent的主要模块`ansys-fluent-core`提供以下功能：
 - 能够在Fluent的求解器事件上注册回调函数，例如可以在读取case或data文件时，或者Fluent求解器完成迭代时实现一些特殊的功能
 - 能够使用MonitorsManager模块检索求解器监视器，例如残差
 
+安装条件：
+Python版本3.7~3.10；Fluent版本2022R2以上
+
 
 
 ## 1、PyFluent API 接口及其使用
