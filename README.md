@@ -38,7 +38,7 @@ PyFluent的主要模块`ansys-fluent-core`提供以下功能：
 
 
 
-![image-20240126092445022](C:\Users\zt\AppData\Roaming\Typora\typora-user-images\image-20240126092445022.png)
+Pic/微信图片_20240126100456.png
 
 # 二、代码展示及结果
 
