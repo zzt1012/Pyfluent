@@ -1,4 +1,4 @@
-# Python调用fluent进行多工况计算
+# Pyfluent进行多工况计算
 
 
 
