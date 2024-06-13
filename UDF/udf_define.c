@@ -3,7 +3,7 @@
 #include "udf.h"
 
 static real T_Max_GLO = 0.0;
-static real T_Min_GLO = 0.0;
+static real T_Min_GLO = REAL_MAX;
 
 /*DEFINE_ADJUST用于获取物体的最大或最小温度*/
 DEFINE_ADJUST(m_temperature, d)
