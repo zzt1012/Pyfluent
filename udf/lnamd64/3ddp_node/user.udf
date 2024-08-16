@@ -1,0 +1,4 @@
+CSOURCES= lamnda_eff.c
+HSOURCES=
+FLUENT_INC=/home/phq/ansys_inc/v231/fluent
+GPU_SUPPORT=off
