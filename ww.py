@@ -3,7 +3,7 @@ import random
 
 #latin超立方
 num_lev = 4
-
+222
 
 heat_flux = np.linspace(80,700,num_lev)  # 用于存储读取的heat_flux值
 beta =  np.linspace(0,10,num_lev)
