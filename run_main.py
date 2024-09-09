@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import threading
+
 import ansys.fluent.core as pyfluent
 from ansys.fluent.core import examples
 from matplotlib import pyplot
@@ -15,8 +17,9 @@ from pyDOE import lhs
 
 
 
+lock = threading.Lock()
 
-num_lev = 20
+num_lev = 10
 
 length_x, length_y, length_z = 304.9406, 320.5, 24.50
 
@@ -65,7 +68,7 @@ def paraller_fluent(start_idx, end_idx):
                                     processor_count=4,
                                     show_gui=True)
 
-    solver.file.read(file_type="case", file_name="data/right_lat_0809.cas")
+    solver.file.read(file_type="case", file_name="data/right_lat_0905.cas")
     solver.tui.mesh.check()
 
     pyfluent.logging.enable()  # 启用log日志
@@ -75,30 +78,35 @@ def paraller_fluent(start_idx, end_idx):
 
     start_time = time.time()  # 记录每个case的开始时间
     print('****************************************')
-    print('设计变量：', data[i, :])
+    print('设计变量：', *data[i, :])
     print('****************************************')
 
-    with open(f'single_design_{i}.txt', 'w') as file:
-        file.write(' '.join(map(str, data[i, :5])) + '\n')
+    with lock:
+        with open(f'./work/index/design_.txt', 'w') as file:
+            file.write(' '.join(map(str, data[i, :6])))
 
     solver.tui.mesh.scale(data[i, 6] / length_x, data[i, 7] / length_y, data[i, 8] / length_z)
 
+
+
     # 加载UDF文件
-    solver.tui.define.user_defined.compiled_functions('unload')
-    solver.tui.define.user_defined.compiled_functions("compile", "liudf", "yes", "lamnda_eff.c")  # 编译udf源文件lambda.c
-    solver.tui.define.user_defined.compiled_functions("load")  # 加载udf
+    with lock:
+        #solver.tui.define.user_defined.compiled_functions('unload')
+        solver.tui.define.user_defined.compiled_functions("compile", "secudf", "yes", "lamnda_eff.c")  # 编译udf源文件lambda.c
+        solver.tui.define.user_defined.compiled_functions("load")  # 加载udf
 
-    # 读取txt中数据
-    solver.tui.define.user_defined.execute_on_demand('"read_file::liudf"')
+        # 读取txt中数据
+        solver.tui.define.user_defined.execute_on_demand('"read_file::secudf"')
 
 
-    solver.tui.define.materials.change_create('nano', 'nano', 'yes', 'user-defined', '"rho::liudf"', 'no', 'yes',
-                                              'user-defined', '"lambda_eff::liudf"')
+    solver.tui.define.materials.change_create('nano', 'nano', 'yes', 'user-defined', '"rho::secudf"', 'no', 'yes',
+                                              'user-defined', '"lambda_eff::secudf"')
     solver.tui.define.boundary_conditions.wall('up', '0', 'no', '0', 'no', 'yes', 'heat-flux', 'yes', 'yes', '"udf"',
-                                               '"heat_flux::liudf"', 'no', 'no', '1')
+                                               '"heat_flux_time::secudf"', 'no', 'no', '1')
 
     # 初始化：standard initialization
     # solver.tui.solve.initialize.compute_defaults.all_zones()
+
     solver.tui.solve.initialize.reference_frame("relative")
     solver.tui.solve.initialize.set_defaults('temperature', '273.15')
     solver.tui.solve.initialize.initialize_flow('yes')
@@ -111,7 +119,7 @@ def paraller_fluent(start_idx, end_idx):
     solver.tui.define.models.unsteady_2nd_order('yes')
     solver.tui.solve.set.transient_controls.time_step_size(10)
     solver.tui.solve.set.transient_controls.max_iterations_per_time_step(20)
-    solver.tui.solve.set.transient_controls.number_of_time_steps(3)#300
+    solver.tui.solve.set.transient_controls.number_of_time_steps(300)#300
     solver.tui.solve.dual_time_iterate()
     solver.tui.solve.iterate()
 
@@ -120,7 +128,7 @@ def paraller_fluent(start_idx, end_idx):
     print('****************************************')
 
     # udf保存数据
-    #solver.tui.define.user_defined.execute_on_demand('"save_file::liudf"')
+    #solver.tui.define.user_defined.execute_on_demand('"save_file::firudf"')
 
     # 创建云图
     solver.results.graphics.contour['total_model'] = {"field": "temperature",
@@ -129,10 +137,10 @@ def paraller_fluent(start_idx, end_idx):
     solver.tui.display.objects.display('total_model')
 
     # 后处理
-    solver.tui.file.export.ascii('work/data_temp/tps5_' + str(i) + '.txt', (), 'yes', 'temperature', 'q', 'yes')
+    solver.tui.file.export.ascii('work/data_temp/tps5_' + str(data[i, 0]) + '.txt', (), 'yes', 'temperature', 'q', 'yes')
 
     # solver.tui.solve.dual_time_iterate('dual_time_iterate', '100', '20')
-    solver.tui.file.write_case_data(('work/tps/tps5_' + str(i) + '.cas'))
+    solver.tui.file.write_case_data(('work/tps/tps5_' + str(data[i, 0]) + '.cas'))
 
     print('****************************************')
     print('第' + str(i) + '次数据保存结束')
@@ -147,7 +155,7 @@ def paraller_fluent(start_idx, end_idx):
 
 if __name__ == "__main__":
 
-    num_cores = 40  # 使用40个核心
+   # num_cores = 40  # 使用40个核心
     num_threads = 10  # 10个线程组
 
     data_threads = num_lev // num_threads
