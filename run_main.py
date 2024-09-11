@@ -18,7 +18,7 @@ from pyDOE import lhs
 
 lock = threading.Lock()
 
-num_lev = 100
+num_lev = 10000
 
 length_x, length_y, length_z = 304.9406, 320.5, 24.50
 
